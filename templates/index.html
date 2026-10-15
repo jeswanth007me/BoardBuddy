@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f5f4ef">
+  <meta name="csrf-token" content="{{ csrf_token() }}">
+  <title>BoardBuddy | Electronics lab assistant</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <script src="{{ url_for('static', filename='app.js') }}" defer></script>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <a class="brand" href="/" aria-label="BoardBuddy home">
+        <span class="brand-mark" aria-hidden="true">BB</span>
+        <span>BoardBuddy</span>
+      </a>
+      <a class="camera-link" href="/camera">Open camera</a>
+      <form class="logout-form" action="{{ url_for('logout') }}" method="post">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button class="logout-button" type="submit">Sign out</button>
+      </form>
+      <div class="service-status" id="service-status" role="status" aria-live="polite">
+        <span class="status-light" aria-hidden="true"></span>
+        <span id="service-status-text">Checking local model…</span>
+      </div>
+    </header>
+
+    <main>
+      <section class="intro-row" aria-labelledby="page-title">
+        <div>
+          <p class="eyebrow">YOUR ELECTRONICS LAB SIDEKICK</p>
+          <h1 id="page-title">Make sense of<br class="desktop-break"> what’s on your bench.</h1>
+          <p class="intro-copy">Snap a parts photo, review what you recognize, then check it against a guided build.</p>
+        </div>
+        <aside class="safety-note" aria-label="Safety guidance">
+          <span class="safety-icon" aria-hidden="true">!</span>
+          <div>
+            <strong>Before you wire</strong>
+            <p>Disconnect power. Check the exact board and sensor pinouts. Never use mains voltage.</p>
+          </div>
+        </aside>
+      </section>
+
+      <section class="workbench" aria-label="Photo identification workspace">
+        <div class="workbench-panel upload-panel">
+          <div class="section-heading">
+            <div>
+              <p class="step-label">01 / PHOTO</p>
+              <h2>Show me your parts</h2>
+            </div>
+            <span class="local-tag">LOCAL ONLY</span>
+          </div>
+          <label class="upload-zone" id="upload-zone" for="image-input">
+            <input id="image-input" type="file" accept="image/jpeg,image/png,image/webp" capture="environment">
+            <span class="upload-symbol" aria-hidden="true">＋</span>
+            <span class="upload-title">Choose or take a photo</span>
+            <span class="upload-hint">JPEG, PNG or WebP · up to 8 MiB</span>
+          </label>
+          <div class="preview-wrap" id="preview-wrap" hidden>
+            <img id="image-preview" alt="Preview of the selected electronics photo">
+            <div class="preview-meta">
+              <span id="file-name"></span>
+              <button class="text-button" id="change-photo" type="button">Change photo</button>
+            </div>
+          </div>
+          <button class="primary-button" id="analyze-button" type="button" disabled>
+            <span aria-hidden="true">✳</span> Identify visible parts
+          </button>
+          <p class="inline-message" id="upload-message" role="status" aria-live="polite"></p>
+          <p class="privacy-note">Your photo is sent only to Ollama on this computer. It is not uploaded to a cloud service.</p>
+        </div>
+
+        <div class="workbench-panel suggestions-panel" aria-labelledby="suggestions-title">
+          <div class="section-heading">
+            <div>
+              <p class="step-label">02 / REVIEW</p>
+              <h2 id="suggestions-title">Parts to review</h2>
+            </div>
+            <button class="small-button" id="add-part" type="button" aria-label="Add a part manually">＋ <span>Add part</span></button>
+          </div>
+          <p class="review-instruction">Check each name and confirm or correct it. Only confirmed parts count as found.</p>
+          <div class="suggestions-list" id="suggestions-list" aria-live="polite">
+            <div class="empty-state" id="empty-suggestions">
+              <span class="empty-mark" aria-hidden="true">⌁</span>
+              <p>Your reviewed parts will show up here.</p>
+            </div>
+          </div>
+          <p class="model-disclaimer">Suggestions can be wrong. Any uncertainty note is a reminder to inspect the part yourself, not a confidence score.</p>
+        </div>
+      </section>
+
+      <section class="project-section" aria-labelledby="project-title">
+        <div class="project-heading">
+          <div>
+            <p class="step-label">03 / BUILD</p>
+            <h2 id="project-title">ESP32 temperature monitor</h2>
+            <p class="project-summary">A low-voltage bench project using an ESP32 DevKit and a DHT22 temperature and humidity sensor.</p>
+          </div>
+          <span class="difficulty-tag">BEGINNER · 5 PARTS</span>
+        </div>
+        <div class="project-grid">
+          <div class="parts-column">
+            <div class="subheading-row">
+              <h3>Parts checklist</h3>
+              <div class="status-legend" aria-label="Checklist status legend">
+                <span><i class="legend-dot found"></i>Confirmed</span>
+                <span><i class="legend-dot unsure"></i>Uncertain</span>
+                <span><i class="legend-dot missing"></i>Missing</span>
+              </div>
+            </div>
+            <p class="checklist-note">“Missing” means not confirmed in your reviewed list; it does not prove the part is absent.</p>
+            <ul class="parts-list" id="parts-list"></ul>
+            <p class="optional-part"><strong>May also be needed:</strong> a 10 kΩ pull-up resistor if your DHT22 is a bare sensor without one built in. Check its module or datasheet.</p>
+          </div>
+          <div class="steps-column">
+            <h3>Build steps</h3>
+            <ol class="steps-list" id="project-steps"></ol>
+          </div>
+        </div>
+      </section>
+
+      <footer class="footer-note">
+        <span class="footer-mark" aria-hidden="true">BB</span>
+        <p><strong>BoardBuddy does not electrically verify a real circuit.</strong> Always check wiring against the exact component documentation before connecting power.</p>
+      </footer>
+    </main>
+  </div>
+</body>
+</html>

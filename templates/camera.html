@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f5f4ef">
+  <meta name="csrf-token" content="{{ csrf_token() }}">
+  <title>BoardBuddy | Phone camera</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='camera.css') }}">
+  <script src="{{ url_for('static', filename='camera.js') }}" defer></script>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <a class="brand" href="/" aria-label="BoardBuddy home">
+        <span class="brand-mark" aria-hidden="true">BB</span>
+        <span>BoardBuddy</span>
+      </a>
+      <a class="camera-link" href="/">Back to workbench</a>
+      <form class="logout-form" action="{{ url_for('logout') }}" method="post">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button class="logout-button" type="submit">Sign out</button>
+      </form>
+    </header>
+
+    <main class="camera-main">
+      <section class="camera-intro" aria-labelledby="camera-title">
+        <p class="eyebrow">PHONE CAMERA · LOCAL ANALYSIS</p>
+        <h1 id="camera-title">Point at your parts.</h1>
+        <p>Capture one clear frame to ask Gemma 3 4B what it can see. The image is analyzed by Ollama on your laptop.</p>
+      </section>
+
+      <aside class="secure-warning" id="secure-warning" role="alert" hidden>
+        <strong>Phone camera access needs trusted HTTPS.</strong>
+        <p>Do not open this page as <code>http://&lt;laptop-ip&gt;</code>. Use BoardBuddy’s HTTPS link with a certificate trusted by your phone. Plain HTTP works for camera permission only on the same device via localhost. The image-upload fallback below still works here.</p>
+      </aside>
+
+      <section class="camera-workspace" aria-label="Camera capture and analysis">
+        <div class="camera-view" id="camera-view">
+          <video id="live-video" autoplay muted playsinline hidden></video>
+          <div class="camera-placeholder" id="camera-placeholder">
+            <span class="camera-placeholder-mark" aria-hidden="true">◉</span>
+            <p>Live camera preview</p>
+            <span>Start the camera to frame your components.</span>
+          </div>
+          <span class="live-indicator" id="live-indicator" hidden><i></i> LIVE PREVIEW</span>
+        </div>
+        <div class="camera-actions">
+          <button class="primary-button" id="start-camera" type="button">Start rear camera</button>
+          <button class="secondary-button" id="stop-camera" type="button" disabled>Stop camera</button>
+          <button class="capture-button" id="capture-analyze" type="button" disabled>Capture frame &amp; analyze</button>
+        </div>
+        <p class="camera-message" id="camera-message" role="status" aria-live="polite"></p>
+
+        <div class="periodic-row">
+          <div>
+            <strong>Repeat analysis</strong>
+            <p>Runs again after each reply plus the selected pause. Requests never overlap.</p>
+          </div>
+          <label for="interval-seconds">Pause
+            <select id="interval-seconds" disabled>
+              <option value="10">10 seconds</option>
+              <option value="20" selected>20 seconds</option>
+              <option value="30">30 seconds</option>
+              <option value="60">60 seconds</option>
+            </select>
+          </label>
+          <button class="secondary-button" id="periodic-toggle" type="button" disabled>Start periodic analysis</button>
+        </div>
+      </section>
+
+      <section class="fallback-section" aria-labelledby="fallback-title">
+        <div>
+          <p class="step-label">CAMERA ALTERNATIVE</p>
+          <h2 id="fallback-title">Choose a photo instead</h2>
+          <p>Use the laptop file picker or your phone’s camera/photo library. JPEG, PNG, or WebP up to 8 MiB.</p>
+        </div>
+        <div class="fallback-controls">
+          <label class="file-picker" for="fallback-image">Choose or take photo</label>
+          <input id="fallback-image" type="file" accept="image/jpeg,image/png,image/webp" capture="environment">
+          <span id="fallback-name" aria-live="polite">No photo selected</span>
+          <button class="primary-button" id="upload-analyze" type="button" disabled>Analyze selected photo</button>
+        </div>
+      </section>
+
+      <section class="camera-results" aria-labelledby="results-title" aria-live="polite">
+        <div class="results-heading">
+          <div>
+            <p class="step-label">LOCAL MODEL RESPONSE</p>
+            <h2 id="results-title">What the model sees</h2>
+          </div>
+          <span class="model-tag" id="model-tag">gemma3:4b</span>
+        </div>
+        <div id="analysis-message" class="analysis-message">No frame analyzed yet.</div>
+        <div id="camera-results-list" class="camera-results-list"></div>
+      </section>
+
+      <footer class="camera-footer">
+        Disconnect power before wiring, check exact pinouts, and never use mains voltage. BoardBuddy does not electrically verify a real circuit. Always review the model’s visible evidence and uncertainty note yourself.
+      </footer>
+    </main>
+  </div>
+</body>
+</html>

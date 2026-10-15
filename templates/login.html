@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f5f4ef">
+  <title>Sign in | BoardBuddy</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <a class="brand" href="/login" aria-label="BoardBuddy sign in">
+        <span class="brand-mark" aria-hidden="true">BB</span>
+        <span>BoardBuddy</span>
+      </a>
+      <span class="local-tag">PRIVATE LAB</span>
+    </header>
+    <main class="login-main">
+      <section class="login-panel" aria-labelledby="login-title">
+        <p class="eyebrow">AUTHORIZED ACCESS</p>
+        <h1 id="login-title">Sign in to BoardBuddy.</h1>
+        <p class="login-copy">Enter the temporary password shared by the lab owner.</p>
+        {% if error %}
+        <p class="login-error" role="alert">{{ error }}</p>
+        {% endif %}
+        <form action="{{ url_for('login') }}" method="post" class="login-form">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <input type="hidden" name="next" value="{{ next_path }}">
+          <label for="password">Temporary password</label>
+          <input id="password" name="password" type="password" autocomplete="current-password" required autofocus>
+          <button class="primary-button" type="submit">Sign in</button>
+        </form>
+        <p class="login-footnote">Use only the HTTPS link provided by the lab owner. Do not share the password in a public channel.</p>
+      </section>
+    </main>
+  </div>
+</body>
+</html>
