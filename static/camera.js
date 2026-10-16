@@ -1,5 +1,48 @@
+
+async function scaleImageFile(file, maxEdge = 800, quality = 0.75) {
+  return new Promise((resolve) => {
+    if (!file || !file.type || !file.type.startsWith("image/")) {
+      resolve(file);
+      return;
+    }
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      const width = img.naturalWidth || img.width;
+      const height = img.naturalHeight || img.height;
+      if (Math.max(width, height) <= maxEdge) {
+        resolve(file);
+        return;
+      }
+      const scale = maxEdge / Math.max(width, height);
+      const canvas = document.createElement("canvas");
+      canvas.width = Math.max(1, Math.round(width * scale));
+      canvas.height = Math.max(1, Math.round(height * scale));
+      const ctx = canvas.getContext("2d");
+      if (!ctx) {
+        resolve(file);
+        return;
+      }
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      canvas.toBlob((blob) => {
+        if (!blob) {
+          resolve(file);
+          return;
+        }
+        resolve(new File([blob], (file.name || "photo").replace(/\.[^/.]+$/, "") + ".jpg", { type: "image/jpeg" }));
+      }, "image/jpeg", quality);
+    };
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+      resolve(file);
+    };
+    img.src = url;
+  });
+}
+
 const MAX_IMAGE_BYTES = 8 * 1024 * 1024;
-const MAX_FRAME_EDGE = 1600;
+const MAX_FRAME_EDGE = 800;
 const ALLOWED_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
 const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
 
@@ -262,7 +305,7 @@ async function captureFrameFile() {
   if (!context) throw new Error("This browser could not prepare the camera frame.");
   context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-  let blob = await captureCanvasBlob(canvas, 0.86);
+  let blob = await captureCanvasBlob(canvas, 0.75);
   if (blob.size > MAX_IMAGE_BYTES) {
     const smallerScale = Math.min(0.75, 1200 / Math.max(canvas.width, canvas.height));
     canvas.width = Math.max(1, Math.round(canvas.width * smallerScale));
@@ -313,8 +356,9 @@ async function analyzeFile(file, sourceLabel) {
   updateControls();
   analysisMessage.textContent = `Sending ${sourceLabel} to local Ollama…`;
   setCameraMessage("Analyzing with the local gemma3:4b model. Larger requests can take a while.");
+  const fileToSend = await scaleImageFile(file, 800, 0.75);
   const formData = new FormData();
-  formData.append("image", file, file.name || "boardbuddy-upload");
+  formData.append("image", fileToSend, fileToSend.name || "boardbuddy-upload");
   try {
     const response = await fetch("/api/analyze", {
       method: "POST",

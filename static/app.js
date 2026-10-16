@@ -1,3 +1,46 @@
+
+async function scaleImageFile(file, maxEdge = 800, quality = 0.75) {
+  return new Promise((resolve) => {
+    if (!file || !file.type || !file.type.startsWith("image/")) {
+      resolve(file);
+      return;
+    }
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      const width = img.naturalWidth || img.width;
+      const height = img.naturalHeight || img.height;
+      if (Math.max(width, height) <= maxEdge) {
+        resolve(file);
+        return;
+      }
+      const scale = maxEdge / Math.max(width, height);
+      const canvas = document.createElement("canvas");
+      canvas.width = Math.max(1, Math.round(width * scale));
+      canvas.height = Math.max(1, Math.round(height * scale));
+      const ctx = canvas.getContext("2d");
+      if (!ctx) {
+        resolve(file);
+        return;
+      }
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      canvas.toBlob((blob) => {
+        if (!blob) {
+          resolve(file);
+          return;
+        }
+        resolve(new File([blob], (file.name || "photo").replace(/\.[^/.]+$/, "") + ".jpg", { type: "image/jpeg" }));
+      }, "image/jpeg", quality);
+    };
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+      resolve(file);
+    };
+    img.src = url;
+  });
+}
+
 const MAX_IMAGE_BYTES = 8 * 1024 * 1024;
 const allowedTypes = new Set(["image/jpeg", "image/png", "image/webp"]);
 const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
@@ -846,8 +889,9 @@ async function analyzePhoto() {
   analyzeButton.textContent = "Analyzing with Ollama…";
   setMessage("");
 
+  const fileToSend = await scaleImageFile(selectedFile, 800, 0.75);
   const formData = new FormData();
-  formData.append("image", selectedFile);
+  formData.append("image", fileToSend);
   try {
     const response = await fetch("/api/analyze", {
       method: "POST",
