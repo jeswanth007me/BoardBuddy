@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f5f4ef">
+  <meta name="csrf-token" content="{{ csrf_token() }}">
+  <title>BoardBuddy | Lab Command Centre</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='camera.css') }}">
+  <script src="{{ url_for('static', filename='monitor.js') }}" defer></script>
+</head>
+<body class="command-body">
+  <div class="app-shell command-shell">
+    <header class="topbar">
+      <a class="brand" href="/" aria-label="BoardBuddy home">
+        <span class="brand-mark" aria-hidden="true">BB</span>
+        <span>BoardBuddy Command Centre</span>
+      </a>
+      <div class="nav-links">
+        <a class="camera-link" href="/">Workbench inventory</a>
+        <a class="camera-link" href="/camera">Phone camera</a>
+      </div>
+      <form class="logout-form" action="{{ url_for('logout') }}" method="post">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button class="logout-button" type="submit">Sign out</button>
+      </form>
+    </header>
+
+    <main class="command-main">
+      <div class="command-grid">
+
+        <!-- ==================== LEFT PANEL: LIVE CAMERA ==================== -->
+        <section class="command-panel command-panel-left" aria-label="Live phone camera feed and snapshot capture">
+          <div class="panel-top-row">
+            <div>
+              <p class="step-label">LEFT PANEL · LIVE FEED</p>
+              <h2 class="panel-heading">Phone Camera Stream</h2>
+            </div>
+            <span class="monitor-badge-inline" id="monitor-badge" data-state="waiting">WAITING</span>
+          </div>
+
+          <div class="camera-view monitor-view">
+            <img id="relay-image" alt="Latest frame from phone camera" hidden>
+            <div class="camera-placeholder" id="monitor-placeholder">
+              <span class="camera-placeholder-mark" aria-hidden="true">◉</span>
+              <p>Waiting for phone camera</p>
+              <span>Start the camera on your phone at /camera</span>
+            </div>
+          </div>
+
+          <div class="monitor-meta-row">
+            <p class="camera-message" id="monitor-detail" role="status" aria-live="polite">Connecting to live relay…</p>
+          </div>
+
+          <div class="monitor-capture-bar">
+            <div class="auto-scan-controls">
+              <label class="auto-scan-label" for="auto-analyze-toggle">
+                <input type="checkbox" id="auto-analyze-toggle" checked>
+                <span>Automatic AI Component Scanning</span>
+              </label>
+              <span class="auto-scan-badge" id="auto-scan-badge">Auto-scan ready</span>
+            </div>
+            <div class="manual-scan-row">
+              <button class="secondary-button" id="monitor-analyze-btn" type="button" disabled title="Trigger an immediate scan of the current frame">
+                📷 Scan now
+              </button>
+              <span class="monitor-action-status" id="monitor-action-status" role="status" aria-live="polite">Waiting for live camera…</span>
+            </div>
+          </div>
+
+          <!-- Live Bench Inventory Quick Bar -->
+          <div class="quick-inventory-container">
+            <div class="quick-inv-header">
+              <strong>Bench Inventory Quick View</strong>
+              <span id="quick-inv-count" class="quick-inv-count">(0 items)</span>
+            </div>
+            <div id="quick-inv-pills" class="quick-inv-pills">
+              <span class="empty-hint">No parts yet. Capture a frame or confirm items on the workbench.</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== RIGHT PANEL: AI LAB ASSISTANT ==================== -->
+        <section class="command-panel command-panel-right" aria-label="Context-aware AI electronics lab assistant">
+          <div class="panel-top-row">
+            <div>
+              <p class="step-label">RIGHT PANEL · AI LAB ASSISTANT</p>
+              <h2 class="panel-heading">Context-Aware Workbench Copilot</h2>
+            </div>
+            <span class="model-tag" id="chat-model-tag">gemma3:4b</span>
+          </div>
+
+          <!-- Active Build & Step Context Box -->
+          <div class="assistant-context-box">
+            <div class="context-top-line">
+              <label for="assistant-project-select" class="context-picker-label">Project Template:</label>
+              <select id="assistant-project-select" class="assistant-project-select">
+                <option value="">Loading project templates…</option>
+              </select>
+              <span id="assistant-readiness-badge" class="readiness-tag readiness-missing">Checking parts…</span>
+            </div>
+
+            <div class="context-parts-line" id="context-parts-summary">
+              <span id="context-parts-confirmed">Confirmed: 0</span> ·
+              <span id="context-parts-missing">Missing: 0</span>
+            </div>
+
+            <!-- Assistant Build Guide Tabs -->
+            <div class="assistant-tab-bar" role="tablist" aria-label="Build guide modes">
+              <button type="button" class="assistant-tab is-active" id="tab-btn-steps" role="tab" aria-selected="true" aria-controls="tab-panel-steps">📋 Steps</button>
+              <button type="button" class="assistant-tab" id="tab-btn-circuit" role="tab" aria-selected="false" aria-controls="tab-panel-circuit">🔌 Circuit &amp; Wiring</button>
+              <button type="button" class="assistant-tab" id="tab-btn-trouble" role="tab" aria-selected="false" aria-controls="tab-panel-trouble">🛠️ Diagnostics</button>
+            </div>
+
+            <!-- Tab Panel 1: Current Step Viewer -->
+            <div class="assistant-tab-panel" id="tab-panel-steps" role="tabpanel">
+              <div class="step-viewer-box">
+                <div class="step-viewer-nav">
+                  <strong id="step-viewer-title">Step 1: Assembly</strong>
+                  <div class="step-btn-group">
+                    <button type="button" class="step-nav-btn" id="prev-step-btn" title="Previous step">&larr; Prev</button>
+                    <span id="step-nav-counter">1 / 6</span>
+                    <button type="button" class="step-nav-btn" id="next-step-btn" title="Next step">Next &rarr;</button>
+                  </div>
+                </div>
+                <p class="step-instruction-body" id="step-instruction-text">Loading step instructions…</p>
+                <div class="step-safety-callout">
+                  <span class="safety-icon-callout">⚠️</span>
+                  <span id="step-safety-text">Disconnect power before wiring or moving components.</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tab Panel 2: Circuit & Pinout Guide -->
+            <div class="assistant-tab-panel" id="tab-panel-circuit" role="tabpanel" hidden>
+              <div class="monitor-circuit-box">
+                <div class="circuit-top-banner">
+                  <strong id="monitor-circuit-title">Circuit &amp; Pinout Netlist</strong>
+                  <span class="circuit-status-tag" id="monitor-circuit-status-tag">Checking parts…</span>
+                </div>
+                <div class="circuit-safety-alert-mini">
+                  <span>⚡ <strong>Power-off Rule:</strong> Keep USB unplugged while wiring. Never apply unknown voltages. Image analysis does not verify physical wiring or electrical safety.</span>
+                </div>
+                <div class="monitor-circuit-table-wrap">
+                  <table class="monitor-circuit-table" id="monitor-circuit-table">
+                    <thead>
+                      <tr>
+                        <th>Net / Signal</th>
+                        <th>From Pin</th>
+                        <th>To Pin</th>
+                        <th>Wire</th>
+                        <th>Part Status</th>
+                      </tr>
+                    </thead>
+                    <tbody id="monitor-circuit-tbody">
+                      <!-- Rendered by JS -->
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tab Panel 3: Diagnostics & Troubleshooting -->
+            <div class="assistant-tab-panel" id="tab-panel-trouble" role="tabpanel" hidden>
+              <div class="monitor-trouble-box">
+                <div class="circuit-top-banner">
+                  <strong>Bench Troubleshooting Checklist</strong>
+                  <span class="trouble-badge">Pre-power checks</span>
+                </div>
+                <p class="monitor-trouble-intro">Common bench pitfalls &amp; multimeter verification points:</p>
+                <ul class="monitor-trouble-list" id="monitor-trouble-list">
+                  <!-- Rendered by JS -->
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- Persistent Chat Interface -->
+          <div class="chat-wrapper">
+            <div class="chat-feed" id="chat-feed" role="log" aria-live="polite">
+              <div class="chat-msg assistant">
+                <div class="chat-bubble">
+                  <div class="bubble-header">
+                    <strong>BoardBuddy Lab Copilot</strong>
+                    <span class="bubble-time">Live</span>
+                  </div>
+                  <p>Hello! I am your AI lab assistant, powered by local Gemma 3 4B. I have full context on your bench inventory and currently selected project.</p>
+                  <p>Ask me about wiring connections, pinouts, resistor color codes, or safety checks for the current step.</p>
+                  <p class="bubble-disclaimer"><em>Safety note: I cannot physically verify pinouts or continuity. Always check datasheets and test with a multimeter before powering on!</em></p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Quick Question Chips -->
+            <div class="quick-prompts-row" aria-label="Suggested questions">
+              <span class="quick-prompt-title">Quick ask:</span>
+              <button type="button" class="prompt-chip" data-prompt="What should I do in this assembly step?">Explain current step</button>
+              <button type="button" class="prompt-chip" data-prompt="Show the exact component-to-pin wiring connections and wire colors for this circuit.">Wiring pinouts</button>
+              <button type="button" class="prompt-chip" data-prompt="What safety checks must I verify before powering this circuit?">Pre-power checks</button>
+              <button type="button" class="prompt-chip" data-prompt="What common wiring mistakes or troubleshooting steps should I check if this circuit doesn't work?">Troubleshooting help</button>
+            </div>
+
+            <!-- Input Bar -->
+            <form id="chat-form" class="chat-input-bar">
+              <input
+                type="text"
+                id="chat-input"
+                class="chat-text-input"
+                placeholder="Ask about this step, pinouts, or wiring (e.g. 'Which pin is DATA on DHT22?')..."
+                autocomplete="off"
+                maxlength="1000"
+                required
+              >
+              <button type="submit" id="chat-send-btn" class="primary-button chat-send-btn">
+                <span>Send</span>
+              </button>
+            </form>
+          </div>
+        </section>
+
+      </div>
+    </main>
+
+    <footer class="footer-note command-footer">
+      <span class="footer-mark" aria-hidden="true">BB</span>
+      <p><strong>BoardBuddy does not electrically verify physical circuits.</strong> Always review wiring and pinouts against official datasheets before applying power. Never use mains voltage.</p>
+    </footer>
+  </div>
+</body>
+</html>

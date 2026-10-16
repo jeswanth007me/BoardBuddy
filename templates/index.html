@@ -16,7 +16,10 @@
         <span class="brand-mark" aria-hidden="true">BB</span>
         <span>BoardBuddy</span>
       </a>
-      <a class="camera-link" href="/camera">Open camera</a>
+      <div class="nav-links">
+        <a class="camera-link" href="/camera">Open phone camera</a>
+        <a class="camera-link" href="/monitor">Open laptop monitor</a>
+      </div>
       <form class="logout-form" action="{{ url_for('logout') }}" method="post">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <button class="logout-button" type="submit">Sign out</button>
@@ -32,13 +35,13 @@
         <div>
           <p class="eyebrow">YOUR ELECTRONICS LAB SIDEKICK</p>
           <h1 id="page-title">Make sense of<br class="desktop-break"> what’s on your bench.</h1>
-          <p class="intro-copy">Snap a parts photo, review what you recognize, then check it against a guided build.</p>
+          <p class="intro-copy">Capture parts with your phone or bench camera, confirm your inventory, and get step-by-step guidance for matching builds.</p>
         </div>
         <aside class="safety-note" aria-label="Safety guidance">
           <span class="safety-icon" aria-hidden="true">!</span>
           <div>
             <strong>Before you wire</strong>
-            <p>Disconnect power. Check the exact board and sensor pinouts. Never use mains voltage.</p>
+            <p>Disconnect all power. Check exact board and sensor pinouts. BoardBuddy does not electrically verify connections.</p>
           </div>
         </aside>
       </section>
@@ -54,7 +57,7 @@
           </div>
           <label class="upload-zone" id="upload-zone" for="image-input">
             <input id="image-input" type="file" accept="image/jpeg,image/png,image/webp" capture="environment">
-            <span class="upload-symbol" aria-hidden="true">＋</span>
+            <span class="upload-symbol" aria-hidden="true">📷</span>
             <span class="upload-title">Choose or take a photo</span>
             <span class="upload-hint">JPEG, PNG or WebP · up to 8 MiB</span>
           </label>
@@ -66,64 +69,177 @@
             </div>
           </div>
           <button class="primary-button" id="analyze-button" type="button" disabled>
-            <span aria-hidden="true">✳</span> Identify visible parts
+            <span aria-hidden="true">🔍</span> Identify visible parts
           </button>
           <p class="inline-message" id="upload-message" role="status" aria-live="polite"></p>
-          <p class="privacy-note">Your photo is sent only to Ollama on this computer. It is not uploaded to a cloud service.</p>
+          <p class="privacy-note">Your photo is sent only to local Ollama. It is not uploaded to any external service.</p>
         </div>
 
         <div class="workbench-panel suggestions-panel" aria-labelledby="suggestions-title">
           <div class="section-heading">
             <div>
-              <p class="step-label">02 / REVIEW</p>
-              <h2 id="suggestions-title">Parts to review</h2>
+              <p class="step-label">02 / INVENTORY REVIEW</p>
+              <h2 id="suggestions-title">Bench Inventory <span class="inventory-count" id="inventory-count">(0)</span></h2>
             </div>
-            <button class="small-button" id="add-part" type="button" aria-label="Add a part manually">＋ <span>Add part</span></button>
+            <div class="panel-actions">
+              <button class="small-button" id="add-part" type="button" aria-label="Add a part manually">+ <span>Add part</span></button>
+              <button class="small-button text-muted" id="clear-inventory" type="button" aria-label="Clear all bench inventory">Clear all</button>
+            </div>
           </div>
-          <p class="review-instruction">Check each name and confirm or correct it. Only confirmed parts count as found.</p>
+          <p class="review-instruction">Check each item and click <strong>I confirm</strong> to approve it. Only confirmed components count toward project readiness.</p>
           <div class="suggestions-list" id="suggestions-list" aria-live="polite">
             <div class="empty-state" id="empty-suggestions">
-              <span class="empty-mark" aria-hidden="true">⌁</span>
-              <p>Your reviewed parts will show up here.</p>
+              <span class="empty-mark" aria-hidden="true">📦</span>
+              <p>No components in inventory yet.</p>
+              <span>Capture a photo here, or use the phone camera to send parts to this bench.</span>
             </div>
           </div>
-          <p class="model-disclaimer">Suggestions can be wrong. Any uncertainty note is a reminder to inspect the part yourself, not a confidence score.</p>
+          <p class="model-disclaimer">AI suggestions are educational aids, not verified inventory. Any uncertainty note is a reminder to inspect the component markings yourself.</p>
         </div>
       </section>
 
-      <section class="project-section" aria-labelledby="project-title">
+      <!-- Step 3: Project Recommendations -->
+      <section class="projects-section" aria-labelledby="recommendations-title">
+        <div class="section-heading-wide">
+          <div>
+            <p class="step-label">03 / PROJECT RECOMMENDATIONS</p>
+            <h2 id="recommendations-title">What you can build right now</h2>
+            <p class="section-sub">Recommendations are calculated automatically from your confirmed bench inventory.</p>
+          </div>
+        </div>
+
+        <div class="projects-grid" id="projects-grid" role="list">
+          <!-- Dynamically populated by app.js -->
+        </div>
+      </section>
+
+      <!-- Step 4: Active Project Guide & Step-by-Step Safety -->
+      <section class="active-project-section" id="active-project-section" aria-labelledby="active-project-title">
         <div class="project-heading">
           <div>
-            <p class="step-label">03 / BUILD</p>
-            <h2 id="project-title">ESP32 temperature monitor</h2>
-            <p class="project-summary">A low-voltage bench project using an ESP32 DevKit and a DHT22 temperature and humidity sensor.</p>
+            <p class="step-label">04 / ACTIVE BUILD GUIDE</p>
+            <h2 id="active-project-title">ESP32 temperature monitor</h2>
+            <p class="project-summary" id="active-project-summary">Loading project details…</p>
           </div>
-          <span class="difficulty-tag">BEGINNER · 5 PARTS</span>
+          <span class="difficulty-tag" id="active-project-difficulty">BEGINNER</span>
         </div>
+
         <div class="project-grid">
+          <!-- Column 1: Parts Checklist -->
           <div class="parts-column">
             <div class="subheading-row">
-              <h3>Parts checklist</h3>
+              <h3>Required Parts Checklist</h3>
               <div class="status-legend" aria-label="Checklist status legend">
                 <span><i class="legend-dot found"></i>Confirmed</span>
-                <span><i class="legend-dot unsure"></i>Uncertain</span>
+                <span><i class="legend-dot unsure"></i>Unconfirmed</span>
                 <span><i class="legend-dot missing"></i>Missing</span>
               </div>
             </div>
-            <p class="checklist-note">“Missing” means not confirmed in your reviewed list; it does not prove the part is absent.</p>
+            <p class="checklist-note">Parts must be <strong>confirmed</strong> in your bench inventory to count as present.</p>
             <ul class="parts-list" id="parts-list"></ul>
-            <p class="optional-part"><strong>May also be needed:</strong> a 10 kΩ pull-up resistor if your DHT22 is a bare sensor without one built in. Check its module or datasheet.</p>
+            <p class="optional-part" id="active-project-optional" hidden></p>
           </div>
+
+          <!-- Column 2: Safety & Steps -->
           <div class="steps-column">
-            <h3>Build steps</h3>
+            <!-- Safety Gate Panel -->
+            <div class="safety-gate-card">
+              <div class="safety-gate-header">
+                <span class="safety-icon-small">⚠️</span>
+                <strong>Pre-Power Safety Verification</strong>
+              </div>
+              <p class="safety-gate-note">Complete these safety checks before wiring and before connecting any power source:</p>
+              <ul class="safety-checklist" id="safety-checklist"></ul>
+            </div>
+
+            <!-- Step by Step Instructions -->
+            <div class="subheading-row steps-header-row">
+              <h3>Assembly Steps</h3>
+              <span class="step-progress-label" id="step-progress-label">0 of 0 completed</span>
+            </div>
+            <div class="progress-bar-wrap">
+              <div class="progress-bar-fill" id="progress-bar-fill"></div>
+            </div>
             <ol class="steps-list" id="project-steps"></ol>
+          </div>
+        </div>
+
+        <!-- Step 5 / Circuit Wiring: 2D Circuit & Pinout Guide (AR-Assemply inspired) -->
+        <div class="circuit-guide-card" id="circuit-guide-card">
+          <div class="circuit-guide-header">
+            <div>
+              <p class="step-label">05 / CIRCUIT &amp; WIRING GUIDE</p>
+              <h3 id="circuit-guide-title">2D Circuit &amp; Pinout Connection Map</h3>
+              <p class="circuit-guide-subtitle" id="circuit-guide-subtitle">Component-to-pin wiring netlist with live inventory verification</p>
+            </div>
+            <div class="circuit-header-badges">
+              <span class="circuit-template-badge" id="circuit-template-badge">Verified Reference Circuit</span>
+              <span class="circuit-status-badge" id="circuit-status-badge">Checking parts…</span>
+            </div>
+          </div>
+
+          <!-- Mandatory Power-Off Safety Alert -->
+          <div class="circuit-safety-alert" role="alert">
+            <span class="circuit-safety-icon">⚡</span>
+            <div class="circuit-safety-text">
+              <strong>MANDATORY POWER-OFF SAFETY:</strong>
+              <span id="circuit-power-source-text">Keep USB and all power supplies completely disconnected while wiring jumper connections. Never connect unknown voltages or power an unverified circuit.</span>
+            </div>
+          </div>
+
+          <!-- 2D Visual Pinout Map Diagram -->
+          <div class="circuit-diagram-wrap" id="circuit-diagram-wrap">
+            <div class="diagram-toolbar">
+              <span class="diagram-title">Visual 2D Pinout Schematic</span>
+              <span class="diagram-disclaimer">Reference wiring guide · Image analysis does not verify physical wiring or electrical safety · Check with multimeter before applying power</span>
+            </div>
+            <div class="diagram-canvas-container" id="circuit-canvas-container">
+              <!-- Dynamically rendered 2D visual schematic SVG -->
+            </div>
+          </div>
+
+          <!-- Component-to-Pin Connection Table -->
+          <div class="circuit-table-wrap">
+            <div class="subheading-row">
+              <h4>Pinout &amp; Wire Netlist</h4>
+              <span class="table-legend-hint">Color-coded jumpers · Live part status</span>
+            </div>
+            <div class="table-scroll">
+              <table class="circuit-connections-table" id="circuit-connections-table">
+                <thead>
+                  <tr>
+                    <th scope="col">Net / Signal</th>
+                    <th scope="col">Source Pin</th>
+                    <th scope="col">Destination Pin</th>
+                    <th scope="col">Wire</th>
+                    <th scope="col">Required Part Status</th>
+                    <th scope="col">Verification &amp; Notes</th>
+                  </tr>
+                </thead>
+                <tbody id="circuit-connections-tbody">
+                  <!-- Dynamically rendered rows -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Troubleshooting & Diagnostics Guide -->
+          <div class="troubleshooting-card" id="troubleshooting-card">
+            <div class="troubleshooting-header">
+              <span class="troubleshoot-icon">🛠️</span>
+              <h4>Troubleshooting &amp; Bench Diagnostics</h4>
+            </div>
+            <p class="troubleshoot-intro">If your build does not respond or behaves erratically, check these common bench failure modes before powering again:</p>
+            <ul class="troubleshooting-list" id="troubleshooting-list">
+              <!-- Dynamically populated troubleshooting rules -->
+            </ul>
           </div>
         </div>
       </section>
 
       <footer class="footer-note">
         <span class="footer-mark" aria-hidden="true">BB</span>
-        <p><strong>BoardBuddy does not electrically verify a real circuit.</strong> Always check wiring against the exact component documentation before connecting power.</p>
+        <p><strong>BoardBuddy does not electrically verify a real circuit.</strong> Always inspect connections against official datasheets with a multimeter before applying power. Never use mains electricity.</p>
       </footer>
     </main>
   </div>

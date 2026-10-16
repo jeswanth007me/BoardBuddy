@@ -209,3 +209,1165 @@ h3 { margin: 0; font-size: 13px; letter-spacing: 0; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; }
 }
+
+
+/* --- Project Recommendations & Active Build Guide ------------------------ */
+
+.nav-links { display: flex; gap: 14px; align-items: center; }
+.inventory-count { font-size: 14px; color: var(--muted); font-weight: normal; }
+.panel-actions { display: flex; gap: 8px; align-items: center; }
+.small-button.text-muted { color: var(--muted); border-color: transparent; }
+.small-button.text-muted:hover { color: var(--orange); border-color: var(--orange); }
+
+.source-badge {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 2px 6px;
+  background: var(--blue-soft);
+  color: var(--blue);
+  border-radius: 4px;
+  font-weight: bold;
+}
+
+.section-heading-wide { margin-top: 36px; margin-bottom: 18px; }
+.section-sub { margin-top: 4px; color: var(--muted); font-size: 14px; }
+
+.projects-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.project-card {
+  background: var(--surface);
+  border: 2px solid var(--line);
+  border-radius: var(--radius);
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s;
+}
+
+.project-card:hover {
+  transform: translateY(-2px);
+  border-color: #a4b2a8;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.project-card.is-selected {
+  border-color: var(--green);
+  background: #fbfdfc;
+  box-shadow: 0 4px 14px rgba(23, 119, 94, 0.12);
+}
+
+.project-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.project-card-diff {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.readiness-tag {
+  font-size: 11px;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: 4px;
+  letter-spacing: 0.3px;
+}
+.readiness-ready { background: #e0f2eb; color: var(--green); }
+.readiness-almost { background: var(--orange-soft); color: var(--orange); }
+.readiness-missing { background: #eee; color: #777; }
+
+.project-card-title {
+  margin: 0 0 8px;
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--ink);
+}
+
+.project-card-summary {
+  margin: 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.45;
+  flex: 1;
+}
+
+.project-card-stats {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid var(--line);
+  padding-top: 12px;
+}
+
+.stats-ratio { font-size: 12px; font-weight: 700; color: var(--ink); }
+
+.project-select-btn {
+  background: transparent;
+  border: 1px solid var(--line);
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.project-select-btn.is-active {
+  background: var(--green);
+  color: white;
+  border-color: var(--green);
+}
+
+/* Safety Gate Panel */
+.safety-gate-card {
+  background: #fff8ef;
+  border: 1px solid #ebd3b0;
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 20px;
+}
+
+.safety-gate-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #8c471c;
+  font-size: 14px;
+  margin-bottom: 6px;
+}
+
+.safety-gate-note {
+  margin: 0 0 12px;
+  font-size: 12px;
+  color: #704020;
+}
+
+.safety-checklist {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.safety-item label {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--ink);
+  cursor: pointer;
+  line-height: 1.4;
+}
+
+.safety-item input[type="checkbox"] {
+  margin-top: 2px;
+  cursor: pointer;
+}
+
+/* Steps & Progress */
+.steps-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.step-progress-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--green);
+}
+
+.progress-bar-wrap {
+  width: 100%;
+  height: 6px;
+  background: var(--line);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: var(--green);
+  width: 0%;
+  transition: width 0.25s ease;
+}
+
+.step-item {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 12px 14px;
+  margin-bottom: 8px;
+  list-style: none;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.step-item.is-completed {
+  background: #f7faf8;
+  border-color: #b7d6c6;
+}
+
+.step-item.is-completed .step-text {
+  color: #738a7c;
+  text-decoration: line-through;
+}
+
+.step-label-wrap {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  cursor: pointer;
+  width: 100%;
+}
+
+.step-checkbox {
+  margin-top: 3px;
+  cursor: pointer;
+}
+
+.step-num { font-weight: 800; color: var(--green); min-width: 18px; }
+.step-text { font-size: 13px; line-height: 1.45; color: var(--ink); }
+
+/* Monitor Actions */
+.monitor-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+.monitor-action-status { font-size: 12px; font-weight: 700; color: var(--green); }
+
+
+/* ==========================================================================
+   Two-Panel Command Centre Layout & Chat Styles
+   ========================================================================== */
+
+.command-shell { max-width: 1440px; margin: 0 auto; padding: 0 32px 32px; }
+.command-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  align-items: stretch;
+  margin-top: 18px;
+}
+
+@media (max-width: 980px) {
+  .command-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.command-panel {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+}
+
+.panel-top-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 10px;
+}
+
+.panel-heading {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--ink);
+}
+
+.monitor-badge-inline {
+  padding: 5px 10px;
+  border-radius: 4px;
+  color: white;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  background: #18201bcc;
+}
+.monitor-badge-inline[data-state="live"] { background: #17775e; }
+.monitor-badge-inline[data-state="stale"] { background: #a8741a; }
+.monitor-badge-inline[data-state="disconnected"] { background: #be542e; }
+.monitor-badge-inline[data-state="stopped"] { background: #4b5651; }
+
+.command-panel-left .monitor-view {
+  position: relative;
+  background: #101614;
+  border-radius: var(--radius);
+  min-height: 280px;
+  max-height: 48vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.command-panel-left .monitor-view img {
+  width: 100%;
+  height: 100%;
+  max-height: 48vh;
+  object-fit: contain;
+}
+
+.monitor-meta-row {
+  margin-top: 8px;
+  font-size: 12px;
+}
+
+.monitor-capture-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+}
+
+/* Quick Inventory Box */
+.quick-inventory-container {
+  margin-top: 14px;
+  background: #fbfbf8;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 12px;
+}
+
+.quick-inv-header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  margin-bottom: 8px;
+}
+
+.quick-inv-count { color: var(--muted); }
+
+.quick-inv-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  max-height: 80px;
+  overflow-y: auto;
+}
+
+.inv-pill {
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  border: 1px solid var(--line);
+  font-weight: 700;
+}
+.inv-pill.is-confirmed { background: var(--green-soft); color: var(--green); border-color: #badcc9; }
+.inv-pill.is-unconfirmed { background: #fdf3e7; color: var(--orange); border-color: #f7d2b0; }
+.empty-hint { font-size: 11px; color: var(--muted); }
+
+/* Right Panel: Assistant Context Box */
+.assistant-context-box {
+  background: #fafaf7;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 14px;
+  margin-bottom: 14px;
+}
+
+.context-top-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.context-picker-label { font-size: 12px; font-weight: 800; color: var(--ink); }
+
+.assistant-project-select {
+  flex: 1;
+  min-width: 180px;
+  padding: 5px 8px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: white;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.context-parts-line {
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 12px;
+  line-height: 1.4;
+}
+
+.step-viewer-box {
+  background: white;
+  border: 1px solid #e1e6de;
+  border-radius: 6px;
+  padding: 12px;
+}
+
+.step-viewer-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.step-btn-group { display: flex; align-items: center; gap: 6px; }
+.step-nav-btn {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.step-nav-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.step-instruction-body {
+  margin: 0 0 8px;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--ink);
+}
+
+.step-safety-callout {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  background: #fff8ef;
+  border-left: 3px solid var(--orange);
+  padding: 6px 8px;
+  border-radius: 2px;
+  font-size: 11px;
+  color: #704020;
+}
+
+/* Chat Component */
+.chat-wrapper {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.chat-feed {
+  height: 290px;
+  overflow-y: auto;
+  background: #fbfbf9;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.chat-msg {
+  display: flex;
+  flex-direction: column;
+  max-width: 88%;
+}
+
+.chat-msg.user { align-self: flex-end; }
+.chat-msg.assistant { align-self: flex-start; }
+
+.chat-bubble {
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.chat-msg.user .chat-bubble {
+  background: var(--blue);
+  color: white;
+  border-bottom-right-radius: 2px;
+}
+
+.chat-msg.assistant .chat-bubble {
+  background: white;
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-bottom-left-radius: 2px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.03);
+}
+
+.chat-msg.is-error .chat-bubble {
+  background: #fdf0ec;
+  border-color: #f7cebe;
+  color: var(--orange);
+}
+
+.bubble-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 11px;
+  margin-bottom: 4px;
+  opacity: 0.8;
+}
+
+.chat-bubble p { margin: 0 0 6px; }
+.chat-bubble p:last-child { margin-bottom: 0; }
+
+.bubble-disclaimer {
+  font-size: 11px;
+  color: var(--muted);
+  border-top: 1px dashed var(--line);
+  padding-top: 6px;
+  margin-top: 6px;
+}
+
+.quick-prompts-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin: 10px 0 8px;
+}
+
+.quick-prompt-title { font-size: 11px; font-weight: 700; color: var(--muted); }
+
+.prompt-chip {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  color: var(--blue);
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.prompt-chip:hover {
+  background: var(--blue-soft);
+  border-color: #bad3f5;
+}
+
+.chat-input-bar {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.chat-text-input {
+  flex: 1;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  font-size: 13px;
+  background: white;
+}
+
+.chat-send-btn {
+  padding: 10px 20px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+
+/* Auto-Scan Controls in Command Centre */
+.auto-scan-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin-bottom: 6px;
+}
+
+.auto-scan-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  color: var(--ink);
+}
+
+.auto-scan-badge {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 4px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  color: var(--muted);
+  transition: all 0.2s ease;
+}
+
+.auto-scan-badge.is-analyzing {
+  background: #eef4fc;
+  color: #1a56db;
+  border-color: #c3d9f8;
+  animation: pulse-badge 1.2s infinite ease-in-out;
+}
+
+.auto-scan-badge.is-active {
+  background: var(--green-soft);
+  color: var(--green);
+  border-color: #badcc9;
+}
+
+.auto-scan-badge.is-idle {
+  background: #fbfbf8;
+  color: var(--muted);
+  border-color: var(--line);
+}
+
+.auto-scan-badge.is-paused {
+  background: #fdf3e7;
+  color: var(--orange);
+  border-color: #f7d2b0;
+}
+
+.auto-scan-badge.is-error {
+  background: #fde8e8;
+  color: #c81e1e;
+  border-color: #f8b4b4;
+}
+
+@keyframes pulse-badge {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.55; }
+}
+
+.manual-scan-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+}
+
+
+/* --- Circuit & Assembly Guide (AR-Assemply Feature) ------------------------- */
+
+.circuit-guide-card {
+  margin-top: 28px;
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.circuit-guide-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 16px;
+  border-bottom: 1px solid #edf1eb;
+  padding-bottom: 14px;
+}
+
+.circuit-guide-header h3 {
+  margin: 4px 0 6px;
+  font-size: 20px;
+  color: var(--ink);
+  font-weight: 800;
+}
+
+.circuit-guide-subtitle {
+  margin: 0;
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+.circuit-header-badges {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.circuit-template-badge {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #f1f5f9;
+  color: #334155;
+  border: 1px solid #cbd5e1;
+}
+
+.circuit-template-badge.is-verified {
+  background: #ecfdf5;
+  color: #065f46;
+  border-color: #a7f3d0;
+}
+
+.circuit-template-badge.is-illustrative {
+  background: #fef3c7;
+  color: #92400e;
+  border-color: #fde68a;
+}
+
+.circuit-status-badge {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 999px;
+}
+
+.circuit-status-badge.status-ready {
+  background: var(--green-soft);
+  color: var(--green);
+  border: 1px solid #a7f3d0;
+}
+
+.circuit-status-badge.status-missing {
+  background: var(--orange-soft);
+  color: var(--orange);
+  border: 1px solid #fbd6c5;
+}
+
+/* Mandatory Power-Off Safety Alert Banner */
+.circuit-safety-alert {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background: #fff8ef;
+  border: 1px solid #fcd34d;
+  border-left: 5px solid #d97706;
+  padding: 12px 16px;
+  border-radius: 6px;
+  margin-bottom: 20px;
+}
+
+.circuit-safety-icon {
+  font-size: 20px;
+  line-height: 1;
+}
+
+.circuit-safety-text {
+  font-size: 13px;
+  line-height: 1.45;
+  color: #78350f;
+}
+
+.circuit-safety-text strong {
+  color: #92400e;
+  font-weight: 800;
+  display: inline-block;
+  margin-right: 4px;
+}
+
+/* 2D Visual Diagram Wrap */
+.circuit-diagram-wrap {
+  background: #0f172a;
+  border-radius: 8px;
+  padding: 14px;
+  margin-bottom: 22px;
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.4);
+}
+
+.diagram-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #334155;
+}
+
+.diagram-title {
+  color: #f8fafc;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.diagram-disclaimer {
+  color: #94a3b8;
+  font-size: 11px;
+}
+
+.diagram-canvas-container {
+  width: 100%;
+  overflow-x: auto;
+  display: flex;
+  justify-content: center;
+}
+
+.circuit-svg {
+  width: 100%;
+  max-width: 680px;
+  height: auto;
+  display: block;
+}
+
+.diagram-empty-notice {
+  padding: 30px;
+  text-align: center;
+  color: #94a3b8;
+  font-size: 13px;
+}
+
+/* Circuit Connections Table */
+.circuit-table-wrap {
+  margin-bottom: 24px;
+}
+
+.table-scroll {
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+}
+
+.circuit-connections-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  text-align: left;
+  background: white;
+}
+
+.circuit-connections-table th {
+  background: #f8faf9;
+  color: var(--muted);
+  font-weight: 700;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--line);
+  white-space: nowrap;
+}
+
+.circuit-connections-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid #f0f3ee;
+  vertical-align: middle;
+}
+
+.circuit-connections-table tr:last-child td {
+  border-bottom: none;
+}
+
+.circuit-connections-table tr:hover {
+  background: #fafbf9;
+}
+
+.net-pill {
+  display: inline-block;
+  padding: 2px 8px;
+  background: #eef2ff;
+  color: #3730a3;
+  border: 1px solid #c7d2fe;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  font-family: monospace;
+}
+
+.pin-cell {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pin-badge {
+  background: #f1f5f9;
+  color: #0f172a;
+  border: 1px solid #cbd5e1;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  font-family: monospace;
+}
+
+.wire-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: white;
+  border: 1px solid #cbd5e1;
+  border-radius: 999px;
+  padding: 2px 8px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.wire-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.conn-notes {
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+.circuit-empty-note {
+  text-align: center;
+  padding: 24px;
+  color: var(--muted);
+}
+
+/* Troubleshooting Card */
+.troubleshooting-card {
+  background: #f8fbf9;
+  border: 1px solid #dbe6de;
+  border-radius: 6px;
+  padding: 16px;
+}
+
+.troubleshooting-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.troubleshooting-header h4 {
+  margin: 0;
+  font-size: 14px;
+  color: var(--ink);
+  font-weight: 800;
+}
+
+.troubleshoot-icon { font-size: 16px; }
+
+.troubleshoot-intro {
+  margin: 0 0 10px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.troubleshooting-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.trouble-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--ink);
+}
+
+.trouble-badge-item {
+  background: #e2e8f0;
+  color: #334155;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+/* --- Monitor Command Centre Assistant Tabs -------------------------------- */
+
+.assistant-tab-bar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 10px;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 4px;
+}
+
+.assistant-tab {
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  padding: 5px 10px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.assistant-tab:hover {
+  color: var(--ink);
+  background: var(--paper);
+}
+
+.assistant-tab.is-active {
+  background: white;
+  border-color: var(--line);
+  color: var(--ink);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.assistant-tab-panel {
+  width: 100%;
+}
+
+.monitor-circuit-box {
+  background: white;
+  border: 1px solid #e1e6de;
+  border-radius: 6px;
+  padding: 10px;
+}
+
+.circuit-top-banner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+  font-size: 12px;
+}
+
+.circuit-status-tag {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 999px;
+}
+
+.circuit-status-tag.tag-ready {
+  background: var(--green-soft);
+  color: var(--green);
+}
+
+.circuit-status-tag.tag-incomplete {
+  background: var(--orange-soft);
+  color: var(--orange);
+}
+
+.circuit-safety-alert-mini {
+  background: #fff8ef;
+  border-left: 3px solid var(--orange);
+  padding: 5px 8px;
+  font-size: 11px;
+  color: #704020;
+  margin-bottom: 8px;
+  border-radius: 2px;
+}
+
+.monitor-circuit-table-wrap {
+  max-height: 180px;
+  overflow-y: auto;
+  border: 1px solid #e2e8f0;
+  border-radius: 4px;
+}
+
+.monitor-circuit-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11px;
+  text-align: left;
+}
+
+.monitor-circuit-table th {
+  background: #f8fafc;
+  color: var(--muted);
+  font-weight: 700;
+  padding: 6px 8px;
+  border-bottom: 1px solid #e2e8f0;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.monitor-circuit-table td {
+  padding: 6px 8px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.monitor-circuit-table .pin-code {
+  font-family: monospace;
+  background: #f1f5f9;
+  padding: 1px 4px;
+  border-radius: 3px;
+  font-size: 10px;
+}
+
+.status-pill {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 999px;
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.status-pill.is-confirmed {
+  background: var(--green-soft);
+  color: var(--green);
+}
+
+.status-pill.is-uncertain {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.status-pill.is-missing {
+  background: var(--orange-soft);
+  color: var(--orange);
+}
+
+.monitor-trouble-box {
+  background: white;
+  border: 1px solid #e1e6de;
+  border-radius: 6px;
+  padding: 10px;
+}
+
+.monitor-trouble-intro {
+  margin: 4px 0 8px;
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.monitor-trouble-list {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 11px;
+  color: var(--ink);
+  line-height: 1.5;
+  max-height: 180px;
+  overflow-y: auto;
+}
+
+.trouble-badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 6px;
+  background: #f1f5f9;
+  color: #475569;
+  border-radius: 4px;
+}

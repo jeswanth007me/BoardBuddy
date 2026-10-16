@@ -19,6 +19,21 @@ const uploadButton = document.querySelector("#upload-analyze");
 const analysisMessage = document.querySelector("#analysis-message");
 const resultsList = document.querySelector("#camera-results-list");
 
+const RELAY_MAX_EDGE = 480;
+const RELAY_JPEG_QUALITY = 0.50;
+const RELAY_PAUSE_MS = 150;
+const RELAY_TIMEOUT_MS = 6000;
+const relayToggle = document.querySelector("#relay-enabled");
+const relayStatus = document.querySelector("#relay-status");
+
+let relaySessionId = null;
+let relayRunning = false;
+let relayTimer = null;
+let relayAbort = null;
+let relaySent = 0;
+let relayFailures = 0;
+let relayCanvas = null;
+
 let cameraStream = null;
 let fallbackFile = null;
 let analysisInFlight = false;
@@ -62,7 +77,118 @@ function stopPeriodicAnalysis() {
   updateControls();
 }
 
+function setRelayStatus(message) {
+  relayStatus.textContent = message;
+}
+
+function newRelaySessionId() {
+  const bytes = new Uint8Array(16);
+  crypto.getRandomValues(bytes);
+  return Array.from(bytes, (byte) => byte.toString(16).padStart(2, "0")).join("");
+}
+
+async function captureRelayBlob() {
+  const sourceWidth = video.videoWidth;
+  const sourceHeight = video.videoHeight;
+  if (!cameraStream || sourceWidth < 1 || sourceHeight < 1) throw new Error("preview-not-ready");
+  const scale = Math.min(1, RELAY_MAX_EDGE / Math.max(sourceWidth, sourceHeight));
+  relayCanvas = relayCanvas || document.createElement("canvas");
+  relayCanvas.width = Math.max(1, Math.round(sourceWidth * scale));
+  relayCanvas.height = Math.max(1, Math.round(sourceHeight * scale));
+  const context = relayCanvas.getContext("2d", { alpha: false });
+  if (!context) throw new Error("canvas-unavailable");
+  context.drawImage(video, 0, 0, relayCanvas.width, relayCanvas.height);
+  return captureCanvasBlob(relayCanvas, RELAY_JPEG_QUALITY);
+}
+
+async function relayTick() {
+  relayTimer = null;
+  if (!relayRunning) return;
+  const sessionId = relaySessionId;
+  let delay = RELAY_PAUSE_MS;
+  try {
+    const blob = await captureRelayBlob();
+    if (!relayRunning || sessionId !== relaySessionId) return;
+    const controller = new AbortController();
+    relayAbort = controller;
+    const timeout = window.setTimeout(() => controller.abort(), RELAY_TIMEOUT_MS);
+    let response;
+    try {
+      response = await fetch("/api/relay/frame", {
+        method: "POST",
+        headers: { "X-CSRF-Token": csrfToken, "X-Relay-Session": sessionId, "Content-Type": "image/jpeg" },
+        body: blob,
+        cache: "no-store",
+        signal: controller.signal,
+      });
+    } finally {
+      window.clearTimeout(timeout);
+    }
+    if (!relayRunning || sessionId !== relaySessionId) return;
+    if (response.status === 401) {
+      stopRelay(false);
+      setRelayStatus("Live relay stopped: you were signed out. Reload and sign in.");
+      return;
+    }
+    if (response.status === 409) {
+      stopRelay(false);
+      setRelayStatus("Live relay stopped by the server. Stop and start the camera again.");
+      return;
+    }
+    if (response.status === 429) {
+      delay = 1500;
+    } else if (!response.ok) {
+      throw new Error(`relay-http-${response.status}`);
+    } else {
+      relaySent += 1;
+      relayFailures = 0;
+      setRelayStatus(`Sending to laptop · ${relaySent} frame${relaySent === 1 ? "" : "s"} sent`);
+    }
+  } catch (error) {
+    if (!relayRunning || sessionId !== relaySessionId) return;
+    if (error.message === "preview-not-ready") {
+      delay = 300;
+    } else {
+      relayFailures += 1;
+      delay = Math.min(5000, RELAY_PAUSE_MS * 2 ** Math.min(relayFailures, 4));
+      setRelayStatus("Live relay interrupted. Retrying…");
+    }
+  }
+  if (relayRunning && sessionId === relaySessionId) {
+    relayTimer = window.setTimeout(relayTick, delay);
+  }
+}
+
+function startRelay() {
+  if (relayRunning || !cameraStream || !relayToggle.checked) return;
+  relaySessionId = newRelaySessionId();
+  relayRunning = true;
+  relaySent = 0;
+  relayFailures = 0;
+  setRelayStatus("Starting live relay…");
+  relayTimer = window.setTimeout(relayTick, 0);
+}
+
+function stopRelay(notifyServer = true) {
+  const sessionId = relaySessionId;
+  relayRunning = false;
+  relaySessionId = null;
+  if (relayTimer !== null) window.clearTimeout(relayTimer);
+  relayTimer = null;
+  if (relayAbort) relayAbort.abort();
+  relayAbort = null;
+  if (sessionId && notifyServer) {
+    fetch("/api/relay/stop", {
+      method: "POST",
+      headers: { "X-CSRF-Token": csrfToken, "X-Relay-Session": sessionId },
+      keepalive: true,
+    }).catch(() => {});
+  }
+  setRelayStatus("Live relay is idle.");
+}
+
 function stopCamera() {
+  stopRelay();
   stopPeriodicAnalysis();
   if (cameraStream) {
     for (const track of cameraStream.getTracks()) track.stop();
@@ -91,6 +217,7 @@ async function startCamera() {
     liveIndicator.hidden = false;
     await video.play();
     setCameraMessage("Rear camera ready. Frame the parts, then capture one still image.", "success");
+    startRelay();
   } catch (error) {
     if (cameraStream) {
       for (const track of cameraStream.getTracks()) track.stop();
@@ -198,7 +325,14 @@ async function analyzeFile(file, sourceLabel) {
     if (!response.ok) throw new Error(result.error || "The local model could not analyze this image.");
     document.querySelector("#model-tag").textContent = result.model || "gemma3:4b";
     renderComponents(result.components || []);
-    setCameraMessage("Analysis complete. Results came from Ollama on this laptop.", "success");
+    if (result.components && result.components.length > 0) {
+      fetch("/api/inventory", {
+        method: "POST",
+        headers: { "X-CSRF-Token": csrfToken, "Content-Type": "application/json" },
+        body: JSON.stringify({ items: result.components, source: "phone camera" }),
+      }).catch(() => {});
+    }
+    setCameraMessage("Analysis complete. Added to shared bench inventory. Review and confirm on workbench.", "success");
     return true;
   } catch (error) {
     analysisMessage.textContent = "No model response for this image.";
@@ -267,6 +401,10 @@ startButton.addEventListener("click", startCamera);
 stopButton.addEventListener("click", stopCamera);
 captureButton.addEventListener("click", analyzeCurrentFrame);
 periodicButton.addEventListener("click", togglePeriodicAnalysis);
+relayToggle.addEventListener("change", () => {
+  if (relayToggle.checked) startRelay();
+  else stopRelay();
+});
 fallbackInput.addEventListener("change", () => selectFallbackFile(fallbackInput.files[0]));
 uploadButton.addEventListener("click", () => {
   if (fallbackFile) analyzeFile(fallbackFile, "selected photo");
