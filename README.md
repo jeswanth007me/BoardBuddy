@@ -2,6 +2,13 @@
 
 BoardBuddy is a local-first electronics lab assistant for reviewing component photos and preparing a simple ESP32 temperature-monitor build. It sends supported photos only to Ollama running on `localhost` with `gemma3:4b`; it has no cloud image service or analytics.
 
+## AI Model and Terms
+
+BoardBuddy uses Google's Gemma 3 model, `gemma3:4b`, through Ollama for local image analysis. The model's terms are separate from BoardBuddy's MIT licence.
+
+- Official Gemma terms: [https://ai.google.dev/gemma/terms](https://ai.google.dev/gemma/terms) (verified official and reachable)
+- Ollama website: [https://ollama.com/](https://ollama.com/) (verified official and reachable)
+
 ## Requirements
 
 - Windows 10/11 and Python 3.14 (the interpreter available during this setup) or another Flask-compatible Python release.
