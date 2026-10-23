@@ -2,6 +2,33 @@
 
 BoardBuddy is a local-first electronics lab assistant for reviewing component photos and preparing a simple ESP32 temperature-monitor build. It sends supported photos only to Ollama running on `localhost` with `gemma3:4b`; it has no cloud image service or analytics.
 
+## Project status
+
+**BoardBuddy is an early-stage prototype.** The current implementation focuses on local AI-assisted component photo review and a simple ESP32 temperature-monitor checklist. The broader vision—persistent project memory, structured circuit validation, voice-guided tutoring, document ingestion, and hardware diagnostics—is planned work, not a claim that those capabilities are already implemented.
+
+### Product documentation
+
+- [Product Requirements Document (PRD)](docs/PRD.md) — users, problem, MVP scope, success criteria and risks.
+- [Software Requirements Specification (SRS)](docs/SRS.md) — functional/non-functional requirements, interfaces, evidence model and acceptance criteria.
+- [Architecture overview](docs/ARCHITECTURE.md) — current prototype boundaries and proposed evolution.
+- [Roadmap to the December 2026 hackathon](docs/ROADMAP.md) — phased plan and demo goals.
+
+### Current capability boundaries
+
+| Area | Current status |
+|---|---|
+| Local Flask web app and authentication | Implemented in public prototype; validate against local checkout |
+| Local Ollama image analysis | Implemented; quality and latency depend on local setup |
+| Component suggestions with evidence/uncertainty | AI suggestions; user review required |
+| ESP32 reference checklist | Implemented as a narrow prototype flow |
+| Persistent project memory / SQLite workspace | Planned |
+| Canonical circuit netlist and design-level electrical rules | Planned |
+| Automated pin/wire recognition and visual hole overlays | Experimental idea; not validated |
+| Physical electrical verification | Not provided by camera/AI alone |
+| Universal multi-domain project building | Long-term vision, not current functionality |
+
+BoardBuddy prioritizes **evidence over unsupported claims**. A model suggestion is not proof that a component is present; an inventory checklist is not proof that wiring is correct; a design-level software check cannot guarantee a physical circuit is safe. Inspect the actual hardware and follow the component/board datasheets before applying power.
+
 ## AI Model and Terms
 
 BoardBuddy uses Google's Gemma 3 model, `gemma3:4b`, through Ollama for local image analysis. The model's terms are separate from BoardBuddy's MIT licence.
